@@ -1,0 +1,83 @@
+# Build outputs — C/C++/NDK
+*.o
+*.o.d
+*.so
+*.a
+*.elf
+*.bin
+*.ko
+*.mod
+*.sym
+*.d
+*.su
+*.idb
+*.pdb
+*.exe
+*.out
+*.obj
+
+# Android build artifacts
+*.apk
+*.ap_
+*.aab
+*.dex
+*.odex
+*.jar
+libs/
+bin/
+gen/
+obj/
+captures/
+
+# Gradle
+.gradle/
+build/
+!gradlew
+!gradle-wrapper.jar
+
+# Local configuration
+local.properties
+
+# IDE
+.vscode/
+.idea/
+*.iml
+*.iws
+*.ipr
+*.swp
+*.swo
+*~
+.DS_Store
+.classpath
+.project
+.metadata
+*.log
+
+# Magisk module outputs
+modules/
+*.img
+ramdisk/
+
+# Coverage
+htmlcov/
+.coverage
+.pytest_cache/
+.mypy_cache/
+.tox/
+
+# OS
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Backup
+*.bak
+*.tmp
+*~
+
+# Editor
+*.code-workspace
+
+# Claude agent config
+.claude/
