@@ -1,0 +1,85 @@
+#
+# ADDITIONAL VENDOR BUILD PROPERTIES
+#
+ro.FSL_AVI_PARSER=1
+ro.FSL_AAC_PARSER=1
+ro.FSL_FLV_PARSER=1
+ro.FSL_MKV_PARSER=1
+ro.FSL_FLAC_PARSER=1
+ro.FSL_MPG2_PARSER=1
+ro.FSL_ASF_PARSER=1
+#
+# Sony Audio Effects - System Properties
+#
+# DSEE AI
+ro.sony.audio.dsee_ai=true
+ro.sony.audio.dsee_ai_stdres=false
+ro.sony.audio.dsee_ai_highres=true
+#
+# ClearPhase
+ro.sony.audio.clearphase=true
+ro.sony.audio.clearphase_type=2
+#
+# Vinyl Processor
+ro.sony.audio.vinyl=true
+ro.sony.audio.vinyl_type=1
+#
+# DSX (Digital Sound eXperience)
+ro.sony.audio.dsx=true
+#
+# HEQ (Headphone EQ)
+ro.sony.audio.heq=true
+ro.sony.audio.heq_preset=0
+#
+# VPT (Virtual Phone Technology)
+ro.sony.audio.vpt=true
+ro.sony.audio.vpt_mode=0
+#
+# DRX (Dynamic Range eXpansion)
+ro.sony.audio.drx=true
+#
+# General
+ro.sony.audio.enabled=true
+ro.sony.audio.debug=false
+#
+# ICX1295 audio system properties
+#
+# Audio tuning
+ro.audio.usb.period_us=20000
+#ro.af.client_heap_size_kbyte=32768
+ro.media.maxmem=3221225471
+#
+# S-Master / DSD
+#audio.offload.min.duration.secs=10
+#
+# Volume steps (31-step volume)
+#ro.config.vc_call_vol_steps=8
+#ro.config.media_vol_steps=31
+#
+# 360 Reality Audio
+ro.sony.audio.format.360ra.enabled=true
+vendor.audio.lpa.enable=0
+#
+# vendor
+ro.FSL_AVI_PARSER=1
+ro.FSL_AAC_PARSER=1
+ro.FSL_FLV_PARSER=1
+ro.FSL_MKV_PARSER=1
+ro.FSL_FLAC_PARSER=1
+ro.FSL_MPG2_PARSER=1
+ro.FSL_ASF_PARSER=1
+ro.sony.swid=04.00.P.4.04.00
+persist.vendor.izmprop.initialized=false
+ro.sony.prop_key.lpa.buffer.time_ms=persist.vendor.lpa.buffer.time_ms
+persist.vendor.lpa.buffer.time_ms=20000
+persist.vendor.audio.mixerthread.res=std
+ro.sony.360ra.capable=1
+audio.safemedia.force=false
+audio.safemedia.bypass=true
+#ro.config.media_vol_default=31
+ro.config.media_vol_default=25
+
+
+
+
+

@@ -76,6 +76,29 @@ $RECYCLE.BIN/
 *.tmp
 *~
 
+# ============================================================
+# Walkman audio effects port — project-specific
+# ============================================================
+# icx1295: broken symlink -> gir clone ROM (host-only mount, not source)
+icx1295
+# system_mode/: live EFS dump from device (binary, runtime artefact)
+system_mode/
+# system/: working-dir device edits (.so/.prop upravy) — runtime, not source
+system/
+# module/system/: Magisk overlay = proprietary Sony blobs (.so/.apk/.jar)
+# Source scripts live in module/ root + module/nvp_emulator/
+module/system/
+# NVP emulator: generated 4-byte node data + runtime logs
+module/nvp_emulator/nvp_data/
+module/debug*.log
+module/nvp_emulator/debug.log
+module/nvp_emulator/nvp_fuse_helper
+module/nvp_emulator/nvp_daemon.pid
+module/nvp_emulator/*.pid
+# Magisk runtime artifacts
+/data/adb/modules/
+modules/
+
 # Editor
 *.code-workspace
 
