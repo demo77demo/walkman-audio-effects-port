@@ -104,3 +104,6 @@ modules/
 
 # Claude agent config
 .claude/
+
+# orphan backup (unremovable without root context)
+nvp_emulator_bak/

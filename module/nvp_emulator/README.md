@@ -11,6 +11,21 @@ This NVP emulator provides a userspace solution that creates `/dev/icx_nvp/NNN` 
 
 ## Components
 
+### Overview — všech 9 scriptů v adresáři
+
+| # | script | role |
+|---|--------|------|
+| 0 | `gen_nvp_binary.sh` | Generuje 243 NVP nodů (4-byte LE) z lookup tabulky `libizmproperties.so`. Jediný zdroj pravdy pro NVP data. |
+| 1 | `nvp_emulator.sh` | Hlavní userspace emulace: `init`/`read`/`write`/`stat`/`eraseall` + vytváří `/dev/icx_nvp/NNN`. |
+| 2 | `init_nvp.sh` | Vestavěný init wrapper volaný `nvp_emulator.sh init`; naplní defaulty + node 022 = model ID. |
+| 3 | `nvp_wrapper.sh` | Přesměrování Sony nástrojů (`nvpflag`/`nvpnode`/`nvpinfo`/`nvpstr`/`nvp`) na emulator. |
+| 4 | `nvp_daemon.sh` | Persistentní daemon: udržuje `/dev/icx_nvp/`, restartuje při změně stanz; `start`/`stop`/`status`/`restart`. |
+| 5 | `setup_nvp_emulator.sh` | Instalace do module dir + symlinky wrapperů do `$PATH` + první `init`. |
+| 6 | `nvp_fuse.sh` | Volitelný FUSE overlay — char-device kompatibilita (ioctl) pro tooling, které nebereme jako běžný soubor. |
+| 7 | `integrate_with_service.sh` | Připojení emulátoru k `service.sh`/`post-fs-data.sh` timeline (volání před IZM HAL). |
+
+> `gen_nvp_binary.sh` není součástí runtime emulace — je to **generátor NVP dat**. Spouští se jen během build/development (viz hlavní walkman-port-playbook). Nikdy nevkládat výstup (`nvp_data/`) do gitu.
+
 ### 1. nvp_emulator.sh
 Main emulator script that:
 - Initializes NVP data directory with default values
@@ -36,6 +51,23 @@ Installation script that:
 - Copies emulator scripts to module directory
 - Creates wrapper scripts for Sony NVP tools
 - Initializes NVP data
+
+### 5. gen_nvp_binary.sh (build-time only)
+Generates the 243 NVP nodes as 4-byte little-endian values from the `libizmproperties.so`
+property info table (parsed at `0x00cbd0`). Output target dir je výchozím `nvp_data/`.
+Critical nodes: `000`=version(1), `018`=ModelID(`0x31000000` ZX507 CEW),
+`019`=Serial(`"1234"`), `022`=Destination(`0x00000103` CEW), `033`=BT initflag, `124`=AVLS enabled.
+
+### 6. init_nvp.sh
+Boot-time initializer invoked by `nvp_emulator.sh init`. Seeds default node images
+and is responsible for writing node `018` (ModelID) + `022` (Destination) so the IZM
+Properties HAL reads the correct device identity before binding.
+
+### 7. nvp_fuse.sh (optional)
+FUSE-backed `/dev/icx_nvp/NNN` char-device shim. Použije se jen pokud běžící tool
+vyžaduje `ioctl`/`select`/`poll` na char device (běžné soubory tím neprojdou).
+Vyžaduje `fuse` kernel modul — na msm8996 3.18 sice dostupný, ale nejlépe potvrdit
+v logcatu před použitím.
 
 ## Installation
 
