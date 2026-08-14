@@ -418,7 +418,11 @@ resetprop ro.product.body_color 0
 [ -d /proc/icx_audio_cxd3778gf_data ] && load_volume_table 0
 
 resetprop -n vendor.sony.log_zip true
-nohup icx_syslog -n 32 -l 6 -d "/mnt/vendor/var" >/dev/null 2>&1 &
+if command -v icx_syslog >/dev/null 2>&1; then
+  nohup icx_syslog -n 32 -l 6 -d "/mnt/vendor/var" >/dev/null 2>&1 &
+else
+  echo "[warn] icx_syslog not found in module/system/vendor/bin — skipped" >> "$LOG"
+fi
 filezip.sh
 resetprop -p --delete vendor.sony.log_zip
 

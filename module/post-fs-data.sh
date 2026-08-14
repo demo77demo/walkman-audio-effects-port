@@ -73,10 +73,12 @@ FILE2=/sys/fs/selinux/policy
 #1permissive
 chmod 0755 $MODPATH/*/libmagiskpolicy.so
 #2magisk_permissive
+# sepolicy.rule / sepolicy.pfsd are OPTIONAL — only load if shipped.
+# Missing files fall back to permissive() global toggle above.
 FILE=$MODPATH/sepolicy.rule
-#ksepolicy_sh
+[ -f "$FILE" ] && sepolicy_sh || echo "[pfsd] no sepolicy.rule — skipping (permissive fallback)" >> "$LOG"
 FILE=$MODPATH/sepolicy.pfsd
-sepolicy_sh
+[ -f "$FILE" ] && sepolicy_sh || echo "[pfsd] no sepolicy.pfsd — skipping (permissive fallback)" >> "$LOG"
 
 # Device detection
 MANUFACTURER=$(getprop ro.product.manufacturer | tr -d '[:space:]')
