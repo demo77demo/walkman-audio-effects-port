@@ -87,7 +87,7 @@ Hlavní HAL = `audio.primary.icx1295.so` (2,7 MB, `vendor/lib64/hw/`). Vždycky 
 | `load_sony_driver` volaný z `init.icx1295.rc` **i** `service.sh:391` | `system_mode/`, `module/service.sh` | **FIXED** `bf12236` — prop-gated (`getprop`) | — |
 | 32-bit shim `msm8996.so` DT_NEEDED → 32-bit `icx1295.so` | `module/system/vendor/lib/hw/` | **OK** — `/vendor/lib/hw/...` potvrzeno `readelf -d` | — |
 | 64-bit shim `msm8996.so` DT_NEEDED → 32-bit cesta ❌ | `module/system/vendor/lib64/hw/` | **FIXED** `2b50c48` — patchelf `--replace-needed /vendor/lib64/hw/...` | verify: `readelf -d module/system/vendor/lib64/hw/audio.primary.msm8996.so \| grep NEEDED` |
-| `nvp_data/` přesunuto z `module/` do `system/` | `module/nvp_emulator/` → `system/` | **RESOLVED** `2026-08-14` — `nvp_data/` je regenerovatelný artefakt (`gen_nvp_binary.sh`); kernel module `icx_nvp_emmc.ko` úspěšně nahrane → `/dev/icx_nvp/000` existuje → emulátor se nepoužije. Kopie v `system/` smazána. `module/` obsahuje jen source. | convention: `system/` = work, `module/` = final. Viz `.gitignore` "DIRECTORY CONVENTIONS" |
+| `icx_nvp_emmc.ko` insmod selže → emulátor JE aktivní (potvrzeno logcat) | `module/service.sh:224-258`, `system/logs/debug.log` | **CONFIRMED** — `insmod: failed to load .../icx_nvp_emmc.ko: Function not implemented` (OnePlus3/A11); `NVP_LOADED=0` → fallback `nvp_emulator/gen_nvp_binary.sh` je jediná funkční cesta (log: `[ -x .../gen_nvp_binary.sh ]` → `cp .../nvp_data/2XX /dev/icx_nvp/2XX`). `nvp_data/` (243 nodes) je runtime-nutné — `gen_nvp_binary.sh` ho regeneruje při každém bootu, kopie v `system/` (workdir) byla zbytečná → smazána. `module/nvp_emulator/` má jen source (`README.md`+`gen_nvp_binary.sh`). | `system/`=work, `module/`=final. Viz `.gitignore` |
 
 ---
 
