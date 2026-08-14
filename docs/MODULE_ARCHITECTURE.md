@@ -87,30 +87,21 @@ module/                            # celý strom je editovatelný, u0_a331
   customize.sh                     # INSTALACE: set_perm + gen NVP data
   post-fs-data.sh                  # EARLY BOOT: permisse, selinux, mount, NVP device, HAL fallback
   service.sh                       # LATE BOOT: resetprop identity/effects, dev nodes, daemons
-  function.sh                      # helper utility (mount, remount, set_read_write) — **NEVOLÁN (mrtý)**
-  recreate_symlinks.sh             # znovuvytvoření ztracených symlinků při zipování
+  *(removed: function.sh)*         | byl **mrtý** (nikdy sourced), smazán
+  recreate_symlinks.sh             | znovuvytvoření ztracených symlinků (GNU glibc ld/soname linky) při zipování
   system.prop                      # statické system properties (FSL parsery, ro.sony.audio.*, …)
   package.txt                      # seznam balíčků pro sulist/denylist (Sony Walkman + 2 Android)
   META-INF/com/google/android/
     update-binary                  # STUB `exit 0` (nefunguje přes TWRP! viz §1.2)
     updater-script                 # `1`
-  nvp_emulator/                    # alternativní toolkit (viz §5) — 8 .sh + README + helper
+  nvp_emulator/                    # toolkit — jen gen_nvp_binary.sh + README.md
     gen_nvp_binary.sh              # AKTIVNÍ (volán z customize.sh + service.sh fallback)
-    init_nvp.sh                    # mrtý (set_perm chmod, nikdy exec)
-    nvp_emulator.sh                # mrtý
-    nvp_wrapper.sh                 # mrtý
-    nvp_daemon.sh                  # mrtý
-    setup_nvp_emulator.sh          # mrtý
-    nvp_fuse.sh                    # mrtý
-    integrate_with_service.sh      # mrtý (jen ukázka cat-heredoc)
-    nvp_fuse_helper                # mrtý binární (gitignored)
-    nvp_data/                      # GENEROVANÉ (gitignored)
+    README.md                     # dokumentace (zastaralá — viz §8.4)
   system/                          # GITIGNORED — flash-time overlay payload (Sony blobs, read-only)
 ```
 
-> `function.sh` je **mrtý kód** — grep potvrdil, že `customize.sh`/`post-fs-data.sh`/`service.sh`
-> ho nikdy `source` nedělají. Obsahuje `mount_partitions_in_recovery`, `get_device`, `mount_mirror`,
-> `remount_rw/ro`, `set_read_write`, ale nikdo ho nevolá. Můžeš klidně odstranit.
+> `function.sh` byl **mrtý kód** — `grep function.sh module/*.sh` = empty;
+> byl smazán. `customize.sh`/`post-fs-data.sh`/`service.sh` ho nikdy `source` nedělají.
 >
 > `system.prop` je Magisk-injectovaný — Magisk ho přidá do `/system` properties (ať už
 > přes `magisk --resetprop` nebo mount). `service.sh` pak přepisuje hodnoty `resetprop -n`
