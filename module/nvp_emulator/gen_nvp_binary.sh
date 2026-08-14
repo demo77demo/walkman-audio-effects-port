@@ -25,7 +25,7 @@ write_node() {
     # Portable on Android /system/bin/sh: toybox printf interprets \xNN to one
     # byte. Old `printf '%b' "$(printf '\\\\xNN')"` emitted 16-byte literal text
     # under toybox/mksh -> violated FIX B1 (cmp w0,#4). Verified on host sh.
-    printf '\x%02x\x%02x\x%02x\x%02x' "$b0" "$b1" "$b2" "$b3" > "$f"
+    printf '%b' "$(printf '\\%03o\\%03o\\%03o\\%03o' "$b0" "$b1" "$b2" "$b3")" > "$f"
 }
 
 # write 4 ASCII bytes into node file $1 from string $2
@@ -43,7 +43,7 @@ write_str4() {
     # Portable on Android /system/bin/sh: toybox printf interprets \xNN to one
     # byte. Old `printf '%b' "$(printf '\\\\xNN')"` emitted 16-byte literal text
     # under toybox/mksh -> violated FIX B1 (cmp w0,#4). Verified on host sh.
-    printf '\x%02x\x%02x\x%02x\x%02x' "$b0" "$b1" "$b2" "$b3" > "$f"
+    printf '%b' "$(printf '\\%03o\\%03o\\%03o\\%03o' "$b0" "$b1" "$b2" "$b3")" > "$f"
 }
 
 # Default all 243 nodes to 0
