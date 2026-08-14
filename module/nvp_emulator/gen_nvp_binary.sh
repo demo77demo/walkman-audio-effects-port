@@ -22,7 +22,10 @@ write_node() {
     local f="$NVP_DATA_DIR/$(printf "%03d" "$node")"
     if echo "$val" | grep -qi "^0x"; then val=$((val)); fi
     local b0=$((val & 0xFF)) b1=$(((val >> 8) & 0xFF)) b2=$(((val >> 16) & 0xFF)) b3=$(((val >> 24) & 0xFF))
-    printf '%b' "$(printf '\\x%02x\\x%02x\\x%02x\\x%02x' $b0 $b1 $b2 $b3)" > "$f"
+    # Portable on Android /system/bin/sh: toybox printf interprets \xNN to one
+    # byte. Old `printf '%b' "$(printf '\\\\xNN')"` emitted 16-byte literal text
+    # under toybox/mksh -> violated FIX B1 (cmp w0,#4). Verified on host sh.
+    printf '\x%02x\x%02x\x%02x\x%02x' "$b0" "$b1" "$b2" "$b3" > "$f"
 }
 
 # write 4 ASCII bytes into node file $1 from string $2
@@ -37,7 +40,10 @@ write_str4() {
     [ $len -ge 2 ] && b1=$(printf '%d' "'$(echo "$s" | cut -c2)")
     [ $len -ge 3 ] && b2=$(printf '%d' "'$(echo "$s" | cut -c3)")
     [ $len -ge 4 ] && b3=$(printf '%d' "'$(echo "$s" | cut -c4)")
-    printf '%b' "$(printf '\\x%02x\\x%02x\\x%02x\\x%02x' $b0 $b1 $b2 $b3)" > "$f"
+    # Portable on Android /system/bin/sh: toybox printf interprets \xNN to one
+    # byte. Old `printf '%b' "$(printf '\\\\xNN')"` emitted 16-byte literal text
+    # under toybox/mksh -> violated FIX B1 (cmp w0,#4). Verified on host sh.
+    printf '\x%02x\x%02x\x%02x\x%02x' "$b0" "$b1" "$b2" "$b3" > "$f"
 }
 
 # Default all 243 nodes to 0
