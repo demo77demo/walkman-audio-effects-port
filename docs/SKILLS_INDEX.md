@@ -72,3 +72,32 @@ Hlavní HAL = `audio.primary.icx1295.so` (2,7 MB, `vendor/lib64/hw/`). Vždycky 
 | NVP emulator (dual impl) | `walkman-port-playbook` | `module/nvp_emulator/`, `module/service.sh:182-190,232-238,298`, `module/post-fs-data.sh:98-107` |
 | Efekty nefungují | `walkman-port-playbook` + `android-elf-patching` | `docs/§6` (coefs všechny v `vendor/etc/`), `service.sh` resetprop |
 | CI pipeline | `shellcheck` / clang | `.github/workflows/ci.yml`, `module/Application.mk` |
+
+---
+
+## G. Known issues (runtime, potvrzené na device)
+
+| Problém | Kde | Status | Skill / akce |
+|---|---|---|---|
+| `icx_syslog` missing → silent cmd-not-found | `module/service.sh:421` | **FIXED** `8b68503` — if/else guard + warn log | — (sh guard) |
+| `sepolicy.rule/.pfsd` neexistují → `sepolicy_sh` no-op | `module/post-fs-data.sh:76-86` | **FIXED** `8b68503` — `[ -f ]` guard, fall back na `permissive()` | — (sh guard) |
+| 64-bit `icx1295.so` TEXTREL + BIND_NOW → Android 11 linker risk | `module/system/vendor/lib64/hw/` | **ACCEPTED** — source není, rebuild impossible; workaround `LD_LIBRARY_PATH=/vendor/lib` | `android-elf-patching`, `add-dlopen-dependency-android-so` |
+| `effect.cpp` = HAL stub (žádný DSEE DSP) | `src/effect.cpp` (68 l.) | **OPEN** — exportuje `walkman_effect_interface`, ale `process()` return 0 (nepracuje). `icx1295.so` obsahuje kompletní `EffectExecuteDPFDSX/VPT/Vinyl` + `.rodata` 1,12 MB coefs | viz §H |
+| armhf `openssl` broken (`ld-linux-armhf.so.3` missing v runtime) | `module/system/bin/openssl` | **DEAD** — nikdy volán module skripty | viz §6.3 |
+| `load_sony_driver` volaný z `init.icx1295.rc` **i** `service.sh:391` | `system_mode/`, `module/service.sh` | **FIXED** `bf12236` — prop-gated (`getprop`) | — |
+| 32-bit shim `msm8996.so` DT_NEEDED → 32-bit `icx1295.so` | `module/system/vendor/lib/hw/` | **OK** — absolutní cesta potvrzena `readelf -d` | — |
+
+---
+
+## H. DSP / DSEE reverse-engineering status
+
+`icx1295.so` (2,7 MB, `vendor/lib64/hw/`) **není jen dispatch** — obsahuje kompletní DSP. Potvrzeno:
+- `nm -D` exportuje `T`: `CalcCoefficient`, `EffectExecuteDPFAttn`, `EffectExecuteDPFDSX`, `EffectExecuteDPFVPT`, `EffectExecuteF2I`, `EffectExecuteI2F`, `EffectExecuteVinyl` + `EffectFinalize/GetDelaySize/GetParam/GetVariable` varianty.
+- `.rodata` = **1 122 360 B** (72 % blobu) — obsahuje **všechny DSP koeficienty** (ClearPhase lps, DSEE bin/dcfg, DSX, VPT, Vinyl).
+- `DT_NEEDED` = `libasound.so` (ALSA) + HIDL stack → standardní Bionic chain, kompatibilní s `linker64`.
+
+**2 cesty k funkčnímu portu:**
+1. **Link-on-existing** — `src/effect.cpp` stub zavolá `icx1295.so` `EffectExecuteDPFDSX` (exported T) přes `dlopen`/`dlsym`. Rychlé, ale TEXTREL risk na Android 11.
+2. **Recompile DSP** — ghidra/odpal `EffectExecuteDPX` + `.rodata` koeficienty → C++ do `src/effect.cpp`. Čistý, ale rozsáhlý (2,7 MB blob, ~1 MB `.rodata`).
+
+Rozhodování je uživatelské (source code Sony není k dispozici).
