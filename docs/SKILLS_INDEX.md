@@ -85,7 +85,8 @@ Hlavní HAL = `audio.primary.icx1295.so` (2,7 MB, `vendor/lib64/hw/`). Vždycky 
 | `effect.cpp` = HAL stub (žádný DSEE DSP) | `src/effect.cpp` (68 l.) | **OPEN** — exportuje `walkman_effect_interface`, ale `process()` return 0 (nepracuje). `icx1295.so` obsahuje kompletní `EffectExecuteDPFDSX/VPT/Vinyl` + `.rodata` 1,12 MB coefs | viz §H |
 | armhf `openssl` broken (`ld-linux-armhf.so.3` missing v runtime) | `module/system/bin/openssl` | **DEAD** — nikdy volán module skripty | viz §6.3 |
 | `load_sony_driver` volaný z `init.icx1295.rc` **i** `service.sh:391` | `system_mode/`, `module/service.sh` | **FIXED** `bf12236` — prop-gated (`getprop`) | — |
-| 32-bit shim `msm8996.so` DT_NEEDED → 32-bit `icx1295.so` | `module/system/vendor/lib/hw/` | **OK** — absolutní cesta potvrzena `readelf -d` | — |
+| 32-bit shim `msm8996.so` DT_NEEDED → 32-bit `icx1295.so` | `module/system/vendor/lib/hw/` | **OK** — `/vendor/lib/hw/...` potvrzeno `readelf -d` | — |
+| 64-bit shim `msm8996.so` DT_NEEDED → 32-bit cesta ❌ | `module/system/vendor/lib64/hw/` | **FIXED** `2b50c48` — dříve `/vendor/lib/hw/...` (ELF class mismatch pro `linker64`), opraveno na `/vendor/lib64/hw/...` (`patchelf --replace-needed`) | verify: `readelf -d lib64/hw/audio.primary.msm8996.so \| grep NEEDED` |
 
 ---
 

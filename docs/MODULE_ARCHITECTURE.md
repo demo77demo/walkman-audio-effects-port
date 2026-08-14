@@ -125,15 +125,20 @@ relativně od cwd `module/system` ale vše funguje). `lib/` má 35 .so, `lib64/`
 **HLAVNÍ HAL model (odchylka od předchozí verze — potvrzeno `readelf -d`):**
 
 Na OnePlus 3 HW název = `msm8996` → Android linker požaduje `audio.primary.msm8996.so`.
-Tenhle soubor je **Sony modifikace** (420 KB, `vendor/lib64/hw/audio.primary.msm8996.so`,
-i 32-bit `vendor/lib/hw/audio.primary.msm8996.so` 371 KB) a jeho **první `DT_NEEDED`** je
-**absolutní cesta** `/vendor/lib/hw/audio.primary.icx1295.so` (verify `readelf -d`):
+Tenhle soubor je **Sony modifikace** — **shim** (injectovaný `DT_NEEDED` jako první record):
+- 64-bit `vendor/lib64/hw/audio.primary.msm8996.so` (420 KB): první `DT_NEEDED` je
+  **absolutní cesta** `/vendor/lib64/hw/audio.primary.icx1295.so` (verify `readelf -d`).
+- 32-bit `vendor/lib/hw/audio.primary.msm8996.so` (371 KB): první `DT_NEEDED` je
+  `/vendor/lib/hw/audio.primary.icx1295.so`.
+
+⚠️ ** historický bug (FIX `2b50c48`+):** původní patchelf injectoval 64-bit shim s 32-bit
+cestou `/vendor/lib/hw/...` → 64-bit `linker64` by odmítl `dlopen` icx1295 (ELF class mismatch).
+Opraveno na `/vendor/lib64/hw/...`. Verify oba:
+`readelf -d lib64/hw/audio.primary.msm8996.so | grep NEEDED` i `readelf -d lib/hw/...`.
 
 ```
-  NEEDED: [/vendor/lib/hw/audio.primary.icx1295.so]   ← injectované (patchelf --add-needed)
-  NEEDED: liblog.so] libcutils.so] libtinyalsa.so] libhardware.so] libtinycompress.so]
-  NEEDED: libaudioroute.so] libaudioutils.so] libexpat.so] libhidlbase.so] libprocessgroup.so]
-  NEEDED: libc++.so] libc.so] libm.so] libdl.so
+  NEEDED: [/vendor/lib64/hw/audio.primary.icx1295.so]   ← injectované (patchelf, arch-match)
+  NEEDED: liblog.so] libcutils.so] libtinyalsa.so] libhardware.so] libtinycompress.so] libaudioroute.so] libaudioutils.so] libexpat.so] libhidlbase.so] libprocessgroup.so] libc++.so] libc.so] libm.so] libdl.so]
   SONAME: audio.primary.msm8996.so
   FLAGS: BIND_NOW, FLAGS_1: NOW
 ```
