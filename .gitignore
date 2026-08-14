@@ -76,8 +76,41 @@ $RECYCLE.BIN/
 *.tmp
 *~
 
+# ============================================================
+# Walkman audio effects port — project-specific
+# ============================================================
+# icx1295: broken symlink -> gir clone ROM (host-only mount, not source)
+icx1295
+# system_mode/: live EFS dump from device (binary, runtime artefact)
+system_mode/
+# ============================================================
+# DIRECTORY CONVENTIONS  ← READ BEFORE TOUCHING
+# ============================================================
+# system/   = WORKING directory — intermediate edits, logs, debug data
+#             .so/.prop upravy, nvp_data/, logs/, nvp_fuse_helper (runtime)
+system/
+# module/   = FINAL Magisk module payload (to flash on device)
+#             ONLY source scripts + META-INF. NO binaries, NO logs, NO .bak
+# module/system/ = proprietary Sony blobs (.so/.apk/.jar) — gitignored,
+#             but must stay CLEAN (no .bak/.tmp/.log)
+module/system/
+# NVP emulator: source scripts only (README.md, gen_nvp_binary.sh)
+# Runtime data (nvp_data/, nvp_fuse_helper, debug.log) moved to system/
+module/nvp_emulator/nvp_data/
+module/debug*.log
+module/nvp_emulator/debug.log
+module/nvp_emulator/nvp_fuse_helper
+module/nvp_emulator/nvp_daemon.pid
+module/nvp_emulator/*.pid
+# Magisk runtime artifacts
+/data/adb/modules/
+modules/
+
 # Editor
 *.code-workspace
 
 # Claude agent config
 .claude/
+
+# orphan backup (unremovable without root context)
+nvp_emulator_bak/

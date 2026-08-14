@@ -1,0 +1,4 @@
+#!/sbin/sh
+# Magisk module update-binary stub
+# Magisk (>=17) handles module installation itself; this stub just succeeds.
+exit 0

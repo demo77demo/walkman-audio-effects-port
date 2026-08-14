@@ -1,0 +1,11 @@
+com.sony.walkman.izmdevicemanager
+com.sony.walkman.funccore
+com.sony.walkman.batteryctrlservice
+com.sony.walkman.audioinfoextractor
+com.sony.walkman.izmaudiomanager
+com.sony.walkman.soundeffectapp
+com.sony.walkman.reginfoview
+com.sony.walkman.storagemonitorservice
+com.sony.walkman.logdumper
+com.android.defcontainer
+com.android.provision

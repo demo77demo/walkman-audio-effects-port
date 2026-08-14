@@ -48,3 +48,7 @@
 - `tdd` – RED-GREEN-REFACTOR enforcement
 - `debug` – systematic 4-phase debugging
 - `refactor` – parallel 3-agent cleanup
+- `add-dlopen-dependency-android-so` – patch lib/.so DT_NEEDED (abs. path pro `hw/` incl.) + ADB `linker` runtime test (bez `su`)
+- `walkman-port-playbook` – tento projekt: index tasků → skill/příkaz, build, .so patch, NVP gen, Magisk, runtime verify
+
+Projektové skily jsou také v `.claude/skills/` (např. literate programming); `.claude/` a `.hermes/` jsou v `.gitignore` a nejsou součástí repa.
