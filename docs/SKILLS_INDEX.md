@@ -86,7 +86,8 @@ Hlavní HAL = `audio.primary.icx1295.so` (2,7 MB, `vendor/lib64/hw/`). Vždycky 
 | armhf `openssl` broken (`ld-linux-armhf.so.3` missing v runtime) | `module/system/bin/openssl` | **DEAD** — nikdy volán module skripty | viz §6.3 |
 | `load_sony_driver` volaný z `init.icx1295.rc` **i** `service.sh:391` | `system_mode/`, `module/service.sh` | **FIXED** `bf12236` — prop-gated (`getprop`) | — |
 | 32-bit shim `msm8996.so` DT_NEEDED → 32-bit `icx1295.so` | `module/system/vendor/lib/hw/` | **OK** — `/vendor/lib/hw/...` potvrzeno `readelf -d` | — |
-| 64-bit shim `msm8996.so` DT_NEEDED → 32-bit cesta ❌ | `module/system/vendor/lib64/hw/` | **FIXED** `2b50c48` — dříve `/vendor/lib/hw/...` (ELF class mismatch pro `linker64`), opraveno na `/vendor/lib64/hw/...` (`patchelf --replace-needed`) | verify: `readelf -d lib64/hw/audio.primary.msm8996.so \| grep NEEDED` |
+| 64-bit shim `msm8996.so` DT_NEEDED → 32-bit cesta ❌ | `module/system/vendor/lib64/hw/` | **FIXED** `2b50c48` — patchelf `--replace-needed /vendor/lib64/hw/...` | verify: `readelf -d module/system/vendor/lib64/hw/audio.primary.msm8996.so \| grep NEEDED`; **CLEAN** `2026-08-14` — remove `.so.bak` from `lib64/hw/`, move debug logs+nvp_data to `system/` (work dir) |
+| Runtime artifacts v `module/` (final dir) | `module/` root | **FIXED** `2026-08-14` — `debug.log`, `debug-pfsd.log`, `nvp_data/`, `nvp_fuse_helper` přesunuto do `system/` (work dir); `.bak` ze `lib64/hw/` smazán. `module/` obsahuje jen source. | convention: `system/` = work, `module/` = final. Viz `.gitignore` "DIRECTORY CONVENTIONS" |
 
 ---
 
