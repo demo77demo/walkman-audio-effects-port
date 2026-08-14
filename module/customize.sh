@@ -6,8 +6,6 @@ ui_print "- Setting up NVP emulator..."
 
 # Set executable permissions for scripts
 set_perm $MODPATH/nvp_emulator/gen_nvp_binary.sh 0 0 0755
-set_perm $MODPATH/nvp_emulator/init_nvp.sh 0 0 0755
-set_perm $MODPATH/nvp_emulator/nvp_fuse.sh 0 0 0755
 set_perm $MODPATH/service.sh 0 0 0755
 set_perm $MODPATH/post-fs-data.sh 0 0 0755
 set_perm $MODPATH/recreate_symlinks.sh 0 0 0755
