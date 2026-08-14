@@ -159,6 +159,12 @@ Obsah HAL dirů (verify `ls -la`):
   `libasound.so`, `izm.android.properties@1.0.so`, `libhardware.so`, `libhidlbase.so`,
   `libhidltransport.so`, `libutils.so`, `libc++.so`, `libc.so`, `libm.so`, `libdl.so` (všechno Bionic,
   `FLAGS: BIND_NOW`).
+- ⚠️ **`TEXTREL` — potvrzené `readelf -d`:** `icx1295.so` má
+  `(TEXTREL) 0x0` + `FLAGS: TEXTREL BIND_NOW` + `FLAGS_1: NOW`. Na Android 11 (Bionic linker) je
+  TEXTREL **riskem** — linker může odmítnout `dlopen` při `dlopen` v režimu `RTLD_NOW`. Je to
+  64-bit `libcxx`+`asm` runtime fixups (rehost/PLT). Dokud `dlopen` selže, AUDIO HAL se nepodaří
+  načíst → fallback k `audio.primary.default.so` → **žádné efekty**. Viz §8 (TEXTREL mitigation TODO).
+  `msm8996.so` (shim) **nemá** TEXTREL — jen `FLAGS: BIND_NOW`, takže selhání pochází z icx1295.
 - **`izm.android.properties@1.0.so` NEEDED:** `libhidlbase`, `libhidltransport`, `libhwbinder` (nebo
   `libhwbinder` na starém), `liblog`, `libutils`, `libcutils`, `libc++`, `libc`, `libm`, `libdl` —
   HIDL binder shim mezi HAL a `libizmproperties.so`.
