@@ -11,7 +11,14 @@ This NVP emulator provides a userspace solution that creates `/dev/icx_nvp/NNN` 
 
 ## Components
 
-### Overview — všech 9 scriptů v adresáři
+### Overview — 8 skriptů (+ 1 gitrojený binární helper `nvp_fuse_helper`)
+
+> ⚠️ **Wiring status:** tento toolkit je **přítom, ale nezapojen** do boot chainu.
+> `customize.sh` a `service.sh` volají **pouze** `gen_nvp_binary.sh`. Ostatní 7 skriptů
+> (`nvp_emulator.sh`, `init_nvp.sh`, `nvp_wrapper.sh`, `nvp_daemon.sh`,
+> `setup_nvp_emulator.sh`, `nvp_fuse.sh`, `integrate_with_service.sh`) **nikdy nejsou volány**
+> z `customize.sh`/`post-fs-data.sh`/`service.sh` (verify: `grep -rn`). `nvp_fuse_helper` (binární)
+> je gitignored → chybí v buildnutém ZIPu. Viz `docs/MODULE_ARCHITECTURE.md` §5.4.
 
 | # | script | role |
 |---|--------|------|
@@ -52,9 +59,11 @@ Installation script that:
 - Creates wrapper scripts for Sony NVP tools
 - Initializes NVP data
 
-### 5. gen_nvp_binary.sh (build-time only)
+### 5. gen_nvp_binary.sh (install-time + boot fallback)
 Generates the 243 NVP nodes as 4-byte little-endian values from the `libizmproperties.so`
 property info table (parsed at `0x00cbd0`). Output target dir je výchozím `nvp_data/`.
+Jediný skript z toolkitu, který se skutečně spouští — volán z `customize.sh:18` (instalace)
+a jako fallback z `service.sh:237` (pokud `nvp_data/` chybí).
 Critical nodes: `000`=version(1), `018`=ModelID(`0x31000000` ZX507 CEW),
 `019`=Serial(`"1234"`), `022`=Destination(`0x00000103` CEW), `033`=BT initflag, `124`=AVLS enabled.
 
@@ -69,10 +78,12 @@ vyžaduje `ioctl`/`select`/`poll` na char device (běžné soubory tím neprojdo
 Vyžaduje `fuse` kernel modul — na msm8996 3.18 sice dostupný, ale nejlépe potvrdit
 v logcatu před použitím.
 
-## Installation
+## Wiring / installation — ⚠️ nezapojený do bootu
 
-### Automatic (via Magisk module)
-The NVP emulator is automatically installed when the Magisk module is flashed. The setup script creates wrapper scripts that replace the Sony NVP tools.
+`nvp_emulator/` **není** automaticky aktivován při flašování modulu. Během instalace
+(`customize.sh`) se spustí **pouze** `gen_nvp_binary.sh`, který vygeneruje
+`nvp_emulator/nvp_data/{000..242}`. Wrapper skripty (`nvpflag`/`nvpnode`/`nvpinfo`/`nvpstr`/`nvp`)
+a daemon (`nvp_daemon.sh`) **nejsou** do boot chainu zapojeny — viz `docs/MODULE_ARCHITECTURE.md` §5.4.
 
 ### Manual
 ```bash
