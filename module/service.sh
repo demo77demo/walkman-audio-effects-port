@@ -381,11 +381,19 @@ chown 0.2000 $MODDIR$MODSYSTEM/vendor/bin/*
 chmod 0755 $MODDIR$MODSYSTEM/vendor/xbin/*
 chown 0.2000 $MODDIR$MODSYSTEM/vendor/xbin/*
 
-# Load drivers
-init.insmod.sh /vendor/etc/early.init.cfg sys.all.early_init.ready
-load_sony_driver sys.all.early_init.ready
-init.insmod.sh /vendor/etc/icx_early.init.cfg vendor.load_nvp_driver.done
-setprop vendor.load_nvp_driver.done 1
+# Load drivers — fallback ONLY. init.rc (init.icx1295.rc) already starts
+# load_sony_driver @ early-init and icx_early_init_sh @ on fs. Gate on the
+# props init.rc sets so we never double-insmod icx_nvp_emmc.ko (race/fixable
+# selftest failure). If init.rc didn't fire (bare OnePlus port), service.sh
+# performs the load here.
+if [ "$(getprop sys.all.early_init.ready)" != "1" ]; then
+    init.insmod.sh /vendor/etc/early.init.cfg sys.all.early_init.ready
+    load_sony_driver sys.all.early_init.ready
+fi
+if [ "$(getprop vendor.load_nvp_driver.done)" != "1" ]; then
+    init.insmod.sh /vendor/etc/icx_early.init.cfg vendor.load_nvp_driver.done
+    setprop vendor.load_nvp_driver.done 1
+fi
 
 # ============================================================
 # ERRR WORKAROUND — re-apply identity props after HAL init
